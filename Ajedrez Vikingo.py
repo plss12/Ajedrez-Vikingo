@@ -5,12 +5,14 @@
 #Movimiento tupla de 4 numeros, (fila inicial, columna inicial, fila final, columnafinal)
 
 #Estado inicial
-#0 casilla vacia, 1 casilla ocupada por peon negro, 2 casilla ocupada por peon blanco y 3 casilla ocupada por el rey blanco
+#0 casilla vacia, 1 casilla ocupada por peon negro, 2 casilla ocupada por peon blanco
+# y 3 casilla ocupada por el rey blanco
 
 from calendar import c
 from hashlib import new
 import random
 import ast
+import pygame
 
 
 def estado_inicial(variante):
@@ -403,14 +405,46 @@ def elige_numero_turnos():
         elige_numero_turnos()
     return numero_turnos
 
+def crear_tablero_pygame(tablero):
+    dimensiones = (693,693)
+    print(tablero)
+    pantalla = pygame.display.set_mode(dimensiones)
+    NEGRO = (0, 0, 0)
+    BLANCO = (255, 255, 255)
+    MARRON = (185,147,90)
+    alto = int(dimensiones[1] / len(tablero))
+    ancho = int(dimensiones[0] / len(tablero[1]))
+    print(dimensiones[1])
+    print(len(tablero))
+    pantalla.fill(MARRON)
+    for i in range(0, dimensiones[0], ancho):
+        for j in range(0, dimensiones[1], alto):
+            if((i==0 and j==0) or (i==0 and j==alto * (len(tablero)-1)) or (i==alto * (len(tablero)-1) and j==0)
+                    or (i==alto * (len(tablero)-1) and j==alto * (len(tablero)-1))
+                    or (i==(alto * (len(tablero)-1))/2 and j==(alto * (len(tablero)-1))/2)):
+                pygame.draw.rect(pantalla, BLANCO, [i, j, ancho, alto], 2)
+            else:
+                pygame.draw.rect(pantalla, NEGRO, [i, j, ancho, alto], 1)
+    pygame.display.flip()
+
 def interfaz_usuario():
+    #Inicializando pygame
+    pygame.init()
+    pygame.display.set_caption("Hnefatafl")
+    icon = pygame.image.load('viking-helmet.png')
+    pygame.display.set_icon(icon)
+
+
     #Se pide al usuario que seleccione una variante de juego
     variante=elige_variante()
     #Se pide al usuario que seleccione un numero de turnos a jugar antes de terminar en tablas
     numero_turnos=elige_numero_turnos()
     #Se crea el estado inicial y una variable que indica el fin de la partida
     estado = estado_inicial(variante)
+    #Crear tablero vacío en pantalla
+    crear_tablero_pygame(estado[0])
     fin = False
+    #Bucle de juego
     while(fin!=True and numero_turnos>0):
         #Se obtienen los posibles movimientos y se imprime el estado actual
         movimientos = obtiene_movimientos(estado)
