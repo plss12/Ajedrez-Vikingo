@@ -13,6 +13,18 @@ from hashlib import new
 import random
 import ast
 import pygame
+import time
+import math
+
+class nodo:
+    def __init__(self,estado,padre):
+        self.estado = estado
+        self.movimientos = obtiene_movimientos(estado)
+        self.n = 0
+        self.q = 0
+        self.i = 0
+        self.hijos = []
+        self.padre = padre
 
 
 def estado_inicial(variante):
@@ -36,7 +48,7 @@ def estado_inicial(variante):
         tablero = ([0,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[1,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,1],[0,0,0,0,0,0,0,1,0,1,0,1,0,0,0,0,0,0,0],[0,0,0,0,0,0,1,0,2,0,2,0,1,0,0,0,0,0,0],[1,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,1],[0,0,0,0,1,0,0,0,0,2,0,0,0,0,1,0,0,0,0],[0,0,0,1,0,0,0,0,2,0,2,0,0,0,0,1,0,0,0],[0,0,0,0,2,0,0,2,0,0,0,2,0,0,2,0,0,0,0],[0,0,0,1,0,0,2,0,0,3,0,0,2,0,0,1,0,0,0],[0,0,0,0,2,0,0,2,0,0,0,2,0,0,2,0,0,0,0],[0,0,0,1,0,0,0,0,2,0,2,0,0,0,0,1,0,0,0],[0,0,0,0,1,0,0,0,0,2,0,0,0,0,1,0,0,0,0],[1,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,1],[0,0,0,0,0,0,1,0,2,0,2,0,1,0,0,0,0,0,0],[0,0,0,0,0,0,0,1,0,1,0,1,0,0,0,0,0,0,0],[1,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,1],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,0])
     if variante == 7:
         #Prueba
-        tablero = ([0,1,0,1,0,2,0],[1,2,1,0,1,2,1],[0,0,1,2,1,2,0],[0,1,2,3,2,1,0],[0,1,1,2,1,1,0],[0,0,0,0,0,0,0],[0,2,0,1,0,2,0])
+        tablero = ([0,3,0,1,0,2,0],[1,2,1,0,1,2,1],[0,0,1,2,1,2,0],[0,1,2,0,2,1,0],[0,1,1,2,1,1,0],[0,0,0,0,0,0,0],[0,2,0,1,0,2,0])
     estado=(tablero,(1))
     return estado
 
@@ -419,7 +431,7 @@ def crear_tablero_pygame(tablero):
     pantalla.fill(MARRON)
     for i in range(0, dimensiones[0], ancho):
         for j in range(0, dimensiones[1], alto):
-            if((i==0 and j==0) or (i==0 and j==alto * (len(tablero)-1)) or (i==alto * (len(tablero)-1) and j==0)
+            if((i==0 and j==0) or (i==0 and j==alto * (len(tablero)-1)) or (i==ancho * (len(tablero)-1) and j==0)
                     or (i==alto * (len(tablero)-1) and j==alto * (len(tablero)-1))
                     or (i==(alto * (len(tablero)-1))/2 and j==(alto * (len(tablero)-1))/2)):
                 pygame.draw.rect(pantalla, BLANCO, [i, j, ancho, alto], 2)
@@ -427,12 +439,75 @@ def crear_tablero_pygame(tablero):
                 pygame.draw.rect(pantalla, NEGRO, [i, j, ancho, alto], 1)
     pygame.display.flip()
 
+# Busca solucion
+
+def busca_solucion(s0, t):
+    v0 = nodo(s0, None)
+    t0 = time.time()
+    while( time.time() - t0 < t):
+        v1 = tree_policy(v0)
+        print(v1)
+        delta = default_policy(v1)
+        backup(v1,delta)
+    mejorNodo= best_child(v0,0)
+    return v0.movimientos[mejorNodo.i]
+
+def tree_policy(v):
+    while( es_estado_final(v.estado, len(v.movimientos))==False):
+        if(v.i<len(v.movimientos)):
+            return expand(v)
+        else:
+            indiceMejorHijo = best_child(v, 1/math.sqrt(2)).i
+            v = v.hijos[indiceMejorHijo]
+
+def expand(v):
+    s = aplica_movimiento(v.estado,v.movimientos[v.i])
+    v.i = v.i+1
+    hijo = nodo(s,v)
+    v.hijos.append(hijo)
+    return hijo
+
+def best_child(v,c):
+    indiceMejorHijo=0
+    contador=0
+    max=0
+    for hijo in v.hijos:
+        heuristica = hijo.q/hijo.n + (c * math.sqrt((2*math.log(v.n))/hijo.n))
+        if(heuristica>max):
+            max = heuristica
+            indiceMejorHijo=contador
+        contador=+1
+    return v.hijos[indiceMejorHijo]
+
+def default_policy(v):
+    s = v.estado
+    movs = v.movimientos
+    jugador = v.estado[1]
+    while(es_estado_final(v.estado,len(movs))==False):
+        a = random.choice(movs)
+        s = aplica_movimiento(s,a)
+        movs = obtiene_movimientos(s)
+    if(ganan_blancas(s,len(movs) and v.estado[1]==2)):
+        return 1
+    elif(ganan_negras(s,len(movs) and v.estado[1]==1)):
+        return 1
+    else:
+        return -1
+
+def backup(v,delta):
+    while(v != None):
+        v.n = v.n+1
+        v.q = v.q + delta
+        delta = -delta
+        v = v.padre
+
+
 def interfaz_usuario():
     #Inicializando pygame
-    pygame.init()
+    """pygame.init()
     pygame.display.set_caption("Hnefatafl")
     icon = pygame.image.load('viking-helmet.png')
-    pygame.display.set_icon(icon)
+    pygame.display.set_icon(icon)"""
 
 
     #Se pide al usuario que seleccione una variante de juego
@@ -442,7 +517,7 @@ def interfaz_usuario():
     #Se crea el estado inicial y una variable que indica el fin de la partida
     estado = estado_inicial(variante)
     #Crear tablero vacío en pantalla
-    crear_tablero_pygame(estado[0])
+    #crear_tablero_pygame(estado[0])
     fin = False
     #Bucle de juego
     while(fin!=True and numero_turnos>0):
@@ -453,6 +528,7 @@ def interfaz_usuario():
         #Se imprimen los posibles movimientos del jugador
         if(fin!=True):
             print(movimientos)
+            #print(busca_solucion(estado,20))
             #Se pide un movimiento y se verifica que sea valido, si lo es se aplica y se pasa al turno del nuevo jugador
             newEstado = movimiento_valido(estado, movimientos)
             estado = newEstado
