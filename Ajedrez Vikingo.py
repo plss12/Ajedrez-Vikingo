@@ -10,6 +10,7 @@
 
 from calendar import c
 from hashlib import new
+from copy import deepcopy
 import random
 import ast
 import pygame
@@ -48,7 +49,7 @@ def estado_inicial(variante):
         tablero = ([0,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[1,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,1],[0,0,0,0,0,0,0,1,0,1,0,1,0,0,0,0,0,0,0],[0,0,0,0,0,0,1,0,2,0,2,0,1,0,0,0,0,0,0],[1,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,1],[0,0,0,0,1,0,0,0,0,2,0,0,0,0,1,0,0,0,0],[0,0,0,1,0,0,0,0,2,0,2,0,0,0,0,1,0,0,0],[0,0,0,0,2,0,0,2,0,0,0,2,0,0,2,0,0,0,0],[0,0,0,1,0,0,2,0,0,3,0,0,2,0,0,1,0,0,0],[0,0,0,0,2,0,0,2,0,0,0,2,0,0,2,0,0,0,0],[0,0,0,1,0,0,0,0,2,0,2,0,0,0,0,1,0,0,0],[0,0,0,0,1,0,0,0,0,2,0,0,0,0,1,0,0,0,0],[1,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,1],[0,0,0,0,0,0,1,0,2,0,2,0,1,0,0,0,0,0,0],[0,0,0,0,0,0,0,1,0,1,0,1,0,0,0,0,0,0,0],[1,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,1],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,0])
     if variante == 7:
         #Prueba
-        tablero = ([0,3,0,1,0,2,0],[1,2,1,0,1,2,1],[0,0,1,2,1,2,0],[0,1,2,0,2,1,0],[0,1,1,2,1,1,0],[0,0,0,0,0,0,0],[0,2,0,1,0,2,0])
+        tablero = ([0,0,3,1,0,2,0],[1,1,1,0,1,2,1],[0,0,1,2,1,2,0],[0,1,2,0,2,1,0],[0,1,1,2,1,1,0],[0,0,0,0,0,0,0],[0,2,0,1,0,2,0])
     estado=(tablero,(1))
     return estado
 
@@ -446,9 +447,11 @@ def busca_solucion(s0, t):
     t0 = time.time()
     while( time.time() - t0 < t):
         v1 = tree_policy(v0)
-        print(v1)
-        delta = default_policy(v1)
-        backup(v1,delta)
+        if(v1!=None):
+            delta = default_policy(v1)
+            backup(v1,delta)
+        else:
+            break
     mejorNodo= best_child(v0,0)
     return v0.movimientos[mejorNodo.i]
 
@@ -485,13 +488,17 @@ def default_policy(v):
     jugador = v.estado[1]
     while(es_estado_final(v.estado,len(movs))==False):
         a = random.choice(movs)
+        print(a)
         s = aplica_movimiento(s,a)
         movs = obtiene_movimientos(s)
-    if(ganan_blancas(s,len(movs) and v.estado[1]==2)):
+    if(ganan_blancas(s,len(movs) and jugador==2)):
+        print("Gana blancas")
         return 1
-    elif(ganan_negras(s,len(movs) and v.estado[1]==1)):
+    elif(ganan_negras(s,len(movs) and jugador==1)):
+        print("Gana negras")
         return 1
     else:
+        print("Nada")
         return -1
 
 def backup(v,delta):
@@ -528,7 +535,8 @@ def interfaz_usuario():
         #Se imprimen los posibles movimientos del jugador
         if(fin!=True):
             print(movimientos)
-            #print(busca_solucion(estado,20))
+            estadoAlternativo=deepcopy(estado)
+            print(busca_solucion(estadoAlternativo,20))
             #Se pide un movimiento y se verifica que sea valido, si lo es se aplica y se pasa al turno del nuevo jugador
             newEstado = movimiento_valido(estado, movimientos)
             estado = newEstado
