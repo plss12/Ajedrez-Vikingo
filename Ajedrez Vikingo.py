@@ -18,12 +18,13 @@ import time
 import math
 
 class nodo:
-    def __init__(self,estado,padre):
+    def __init__(self,estado,padre,numero_turno):
         self.estado = estado
         self.movimientos = obtiene_movimientos(estado)
         self.n = 0
         self.q = 0
         self.i = 0
+        self.turno = numero_turno
         self.hijos = []
         self.padre = padre
 
@@ -49,7 +50,7 @@ def estado_inicial(variante):
         tablero = ([0,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[1,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,1],[0,0,0,0,0,0,0,1,0,1,0,1,0,0,0,0,0,0,0],[0,0,0,0,0,0,1,0,2,0,2,0,1,0,0,0,0,0,0],[1,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,1],[0,0,0,0,1,0,0,0,0,2,0,0,0,0,1,0,0,0,0],[0,0,0,1,0,0,0,0,2,0,2,0,0,0,0,1,0,0,0],[0,0,0,0,2,0,0,2,0,0,0,2,0,0,2,0,0,0,0],[0,0,0,1,0,0,2,0,0,3,0,0,2,0,0,1,0,0,0],[0,0,0,0,2,0,0,2,0,0,0,2,0,0,2,0,0,0,0],[0,0,0,1,0,0,0,0,2,0,2,0,0,0,0,1,0,0,0],[0,0,0,0,1,0,0,0,0,2,0,0,0,0,1,0,0,0,0],[1,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,1],[0,0,0,0,0,0,1,0,2,0,2,0,1,0,0,0,0,0,0],[0,0,0,0,0,0,0,1,0,1,0,1,0,0,0,0,0,0,0],[1,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,1],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,0])
     if variante == 7:
         #Prueba
-        tablero = ([0,0,3,1,0,2,0],[1,1,1,0,1,2,1],[0,0,1,2,1,2,0],[0,1,2,0,2,1,0],[0,1,1,2,1,1,0],[0,0,0,0,0,0,0],[0,2,0,1,0,2,0])
+        tablero = ([0,0,0,1,0,0,0],[1,1,1,0,1,0,1],[0,0,1,0,1,0,0],[0,1,1,3,1,1,0],[0,1,1,1,1,1,0],[0,0,0,0,0,0,0],[0,0,0,1,0,0,0])
     estado=(tablero,(1))
     return estado
 
@@ -235,8 +236,10 @@ def ganan_blancas(estado, numero_de_movimientos):
         resultado=True
     return resultado
 
-def es_estado_final(estado, numero_de_movimientos):
+def es_estado_final(estado, numero_de_movimientos, numero_turnos):
     if(numero_de_movimientos==0):
+        return True
+    elif(numero_turnos==0):
         return True
     else:
         negras_ganan = ganan_negras(estado, numero_de_movimientos)
@@ -271,16 +274,19 @@ def imprime_tablero(tablero):
     print("\n")
 
 
-def imprime_estado(estado, numero_de_movimientos):
+def imprime_estado(estado, numero_de_movimientos, numero_turnos):
     tablero = estado[0]
     #Recorremos el tablero e imprimimos en consola el valor de cada casilla siendo 
     #0=vacio, 1=negras, 2=blancas, 3=rey
     imprime_tablero(tablero)
     jugador = estado[1]   
     #Se comprueba si el estado es final y se imprime el resultado dependiendo del jugador que haya jugado anteriormente
-    final=es_estado_final(estado, numero_de_movimientos)
+    final=es_estado_final(estado, numero_de_movimientos, numero_turnos)
     if(final):
-        if(jugador==1):
+        if(numero_turnos==0):
+            print("Tablas, se acabaron los turnos")
+            return True
+        elif(jugador==1):
             print("Ganan blancas")
             return True
         else:
@@ -442,31 +448,29 @@ def crear_tablero_pygame(tablero):
 
 # Busca solucion
 
-def busca_solucion(s0, t):
-    v0 = nodo(s0, None)
+def busca_solucion(s0, t, numero_turno):
+    v0 = nodo(s0, None, numero_turno)
     t0 = time.time()
     while( time.time() - t0 < t):
         v1 = tree_policy(v0)
-        if(v1!=None):
-            delta = default_policy(v1)
-            backup(v1,delta)
-        else:
-            break
+        delta = default_policy(v1)
+        backup(v1,delta)
     mejorNodo= best_child(v0,0)
     return v0.movimientos[mejorNodo.i]
 
 def tree_policy(v):
-    while( es_estado_final(v.estado, len(v.movimientos))==False):
+    while( es_estado_final(v.estado, len(v.movimientos), v.turno)==False):
         if(v.i<len(v.movimientos)):
             return expand(v)
         else:
             indiceMejorHijo = best_child(v, 1/math.sqrt(2)).i
             v = v.hijos[indiceMejorHijo]
+    return v
 
 def expand(v):
     s = aplica_movimiento(v.estado,v.movimientos[v.i])
     v.i = v.i+1
-    hijo = nodo(s,v)
+    hijo = nodo(s,v,v.turno-1)
     v.hijos.append(hijo)
     return hijo
 
@@ -483,22 +487,23 @@ def best_child(v,c):
     return v.hijos[indiceMejorHijo]
 
 def default_policy(v):
-    s = v.estado
+    s = deepcopy(v.estado)
     movs = v.movimientos
     jugador = v.estado[1]
-    while(es_estado_final(v.estado,len(movs))==False):
+    turno = v.turno
+    while(es_estado_final(s,len(movs),turno)==False):
         a = random.choice(movs)
-        print(a)
         s = aplica_movimiento(s,a)
         movs = obtiene_movimientos(s)
+        turno -= 1
     if(ganan_blancas(s,len(movs) and jugador==2)):
-        print("Gana blancas")
+        #print("Blancas")
         return 1
     elif(ganan_negras(s,len(movs) and jugador==1)):
-        print("Gana negras")
+        #print("Negras")
         return 1
     else:
-        print("Nada")
+        #print("Empate")
         return -1
 
 def backup(v,delta):
@@ -527,22 +532,24 @@ def interfaz_usuario():
     #crear_tablero_pygame(estado[0])
     fin = False
     #Bucle de juego
-    while(fin!=True and numero_turnos>0):
+    while(fin!=True):
         #Se obtienen los posibles movimientos y se imprime el estado actual
         movimientos = obtiene_movimientos(estado)
         num_movimientos = len(movimientos)
-        fin = imprime_estado(estado, num_movimientos)
+        fin = imprime_estado(estado, num_movimientos,numero_turnos)
         #Se imprimen los posibles movimientos del jugador
         if(fin!=True):
             print(movimientos)
             estadoAlternativo=deepcopy(estado)
-            print(busca_solucion(estadoAlternativo,20))
+            #print(busca_solucion(estadoAlternativo, 9999999999, numero_turnos))
             #Se pide un movimiento y se verifica que sea valido, si lo es se aplica y se pasa al turno del nuevo jugador
-            newEstado = movimiento_valido(estado, movimientos)
+            #newEstado = movimiento_valido(estado, movimientos)
+            accion = busca_solucion(estadoAlternativo, 20, numero_turnos)
+            print(accion)
+            newEstado = aplica_movimiento(estado, accion)
             estado = newEstado
             numero_turnos-=1
-    if(numero_turnos==0):
-        print("Tablas, se acabaron los turnos")
+
            
          
 def main():
