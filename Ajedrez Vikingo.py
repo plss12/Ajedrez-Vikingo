@@ -347,30 +347,30 @@ def aplica_movimiento(estado, movimiento):
                 
     #Este caso es el normal el cual aplica al encerrar una ficha entre dos tuyas, tambien se comprueba si la ficha esta conjunta a la esquina la cual actua como una ficha compañera
     if(arr>0):
-        if(tablero[arr][newJ] in fichas_rival):
+        if(tablero[arr][newJ] in fichas_rival and (arr,newJ)!=centro):
             if((arr-1==0) and (newJ==0 or newJ==numer_filas-1)):
                 newTablero[arr][newJ]=0
             elif(tablero[arr-1][newJ] in fichas_jugador):
                 newTablero[arr][newJ]=0
     if(abj<numer_filas-1):
-        if(tablero[abj][newJ] in fichas_rival):
+        if(tablero[abj][newJ] in fichas_rival and (abj,newJ)!=centro):
             if((abj+1==numer_filas-1) and (newJ==0 or newJ==numer_filas-1)):
                 newTablero[abj][newJ]=0
             elif(tablero[abj+1][newJ] in fichas_jugador):
                 newTablero[abj][newJ]=0
     if(izq>0):
-        if(tablero[newI][izq] in fichas_rival):
+        if(tablero[newI][izq] in fichas_rival and (newI,izq)!=centro):
             if((izq-1==0) and (newI==0 or newI==numer_filas-1)):
                 newTablero[newI][izq]=0
             elif(tablero[newI][izq-1] in fichas_jugador):
                 newTablero[newI][izq]=0
     if(der<numer_filas-1):
-        if(tablero[newI][der] in fichas_rival):
+        if(tablero[newI][der] in fichas_rival and (newI,der)!=centro):
             if((der+1==numer_filas-1) and (newI==0 or newI==numer_filas-1)):
                 newTablero[newI][der]=0
             elif(tablero[newI][der+1] in fichas_jugador):
                 newTablero[newI][der]=0
-
+                
     if(ficha==1):
         newEstado=(newTablero, 2)
     else:
