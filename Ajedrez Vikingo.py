@@ -36,10 +36,10 @@ def estado_inicial(variante):
         #Prueba
         tablero = ([0,0,0,0,1,0,0],
                    [1,2,0,1,2,0,0],
-                   [1,2,1,0,0,1,1],
-                   [1,1,2,3,0,2,1],
-                   [0,0,0,1,2,0,1],
-                   [0,0,2,1,0,0,0],
+                   [1,2,1,3,0,1,1],
+                   [1,1,2,0,2,1,1],
+                   [0,0,0,1,1,2,1],
+                   [0,0,2,1,1,0,0],
                    [0,0,1,0,0,0,0])
     estado=(tablero,(1))
     return estado
@@ -319,7 +319,7 @@ def aplica_movimiento(estado, movimiento):
     vecinos_movimiento=((arr,newJ),(abj,newJ),(newI,izq),(newI,der))
     coord_centro=int((numer_filas-1)/2)
     centro=(coord_centro,coord_centro)
-    vecinos_centro=((coord_centro,coord_centro+1),(coord_centro,coord_centro-1),(coord_centro-1,coord_centro),(coord_centro+1,coord_centro))
+    centro_y_vecinos_centro=(centro,(coord_centro,coord_centro+1),(coord_centro,coord_centro-1),(coord_centro-1,coord_centro),(coord_centro+1,coord_centro))
     #Se comprueba en que tipo de movimiento estamos en cuanto a captura; la pieza capturada esta en el centro, esta en una vecina del centro o se encueentra en una posicion normal
     #Este caso es que la ficha a comer esta en el centro el cual debe ser rodeado por los 3 lados
     if(centro in vecinos_movimiento):
@@ -328,44 +328,44 @@ def aplica_movimiento(estado, movimiento):
                 newTablero[coord_centro][coord_centro]=0
                 
     #Este caso es que la ficha a comer esta en una vecina del centro la cual debe ser rodeada por los 3 lados sin contar el centro
-    elif((coord_centro,coord_centro+1) in vecinos_movimiento):
+    if((coord_centro,coord_centro+1) in vecinos_movimiento):
         if(tablero[coord_centro][coord_centro+1] in fichas_rival):
             if(newTablero[coord_centro+1][coord_centro+1] in fichas_jugador and newTablero[coord_centro-1][coord_centro+1] in fichas_jugador and newTablero[coord_centro][coord_centro+2] in fichas_jugador):
                 newTablero[coord_centro][coord_centro+1]=0
-    elif((coord_centro,coord_centro-1) in vecinos_movimiento):
+    if((coord_centro,coord_centro-1) in vecinos_movimiento):
         if(tablero[coord_centro][coord_centro-1] in fichas_rival):
             if(newTablero[coord_centro-1][coord_centro-1] in fichas_jugador and newTablero[coord_centro+1][coord_centro-1] in fichas_jugador and newTablero[coord_centro][coord_centro-2] in fichas_jugador):
                 newTablero[coord_centro][coord_centro-1]=0
-    elif((coord_centro+1,coord_centro) in vecinos_movimiento):
+    if((coord_centro+1,coord_centro) in vecinos_movimiento):
         if(tablero[coord_centro+1][coord_centro] in fichas_rival):
             if(newTablero[coord_centro+2][coord_centro] in fichas_jugador and newTablero[coord_centro+1][coord_centro+1] in fichas_jugador and newTablero[coord_centro+1][coord_centro-1] in fichas_jugador):
                 newTablero[coord_centro+1][coord_centro]=0
-    elif((coord_centro-1,coord_centro) in vecinos_movimiento):
+    if((coord_centro-1,coord_centro) in vecinos_movimiento):
         if(tablero[coord_centro-1][coord_centro] in fichas_rival):
             if(newTablero[coord_centro-2][coord_centro] in fichas_jugador and newTablero[coord_centro-1][coord_centro+1] in fichas_jugador and newTablero[coord_centro-1][coord_centro-1] in fichas_jugador):
                 newTablero[coord_centro-1][coord_centro]=0
                 
     #Este caso es el normal el cual aplica al encerrar una ficha entre dos tuyas, tambien se comprueba si la ficha esta conjunta a la esquina la cual actua como una ficha compañera
     if(arr>0):
-        if(tablero[arr][newJ] in fichas_rival and (arr,newJ)!=centro):
+        if(tablero[arr][newJ] in fichas_rival and ((arr,newJ) in centro_y_vecinos_centro)==False):
             if((arr-1==0) and (newJ==0 or newJ==numer_filas-1)):
                 newTablero[arr][newJ]=0
             elif(tablero[arr-1][newJ] in fichas_jugador):
                 newTablero[arr][newJ]=0
     if(abj<numer_filas-1):
-        if(tablero[abj][newJ] in fichas_rival and (abj,newJ)!=centro):
+        if(tablero[abj][newJ] in fichas_rival and ((abj,newJ) in centro_y_vecinos_centro)==False):
             if((abj+1==numer_filas-1) and (newJ==0 or newJ==numer_filas-1)):
                 newTablero[abj][newJ]=0
             elif(tablero[abj+1][newJ] in fichas_jugador):
                 newTablero[abj][newJ]=0
     if(izq>0):
-        if(tablero[newI][izq] in fichas_rival and (newI,izq)!=centro):
+        if(tablero[newI][izq] in fichas_rival and ((newI,izq) in centro_y_vecinos_centro)==False):
             if((izq-1==0) and (newI==0 or newI==numer_filas-1)):
                 newTablero[newI][izq]=0
             elif(tablero[newI][izq-1] in fichas_jugador):
                 newTablero[newI][izq]=0
     if(der<numer_filas-1):
-        if(tablero[newI][der] in fichas_rival and (newI,der)!=centro):
+        if(tablero[newI][der] in fichas_rival and ((newI,der) in centro_y_vecinos_centro)==False):
             if((der+1==numer_filas-1) and (newI==0 or newI==numer_filas-1)):
                 newTablero[newI][der]=0
             elif(tablero[newI][der+1] in fichas_jugador):
