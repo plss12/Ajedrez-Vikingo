@@ -24,6 +24,7 @@ class nodo:
         self.n = 0
         self.q = 0
         self.i = 0
+        self.indMov=0
         self.turno = numero_turno
         self.hijos = []
         self.padre = padre
@@ -50,7 +51,13 @@ def estado_inicial(variante):
         tablero = ([0,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[1,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,1],[0,0,0,0,0,0,0,1,0,1,0,1,0,0,0,0,0,0,0],[0,0,0,0,0,0,1,0,2,0,2,0,1,0,0,0,0,0,0],[1,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,1],[0,0,0,0,1,0,0,0,0,2,0,0,0,0,1,0,0,0,0],[0,0,0,1,0,0,0,0,2,0,2,0,0,0,0,1,0,0,0],[0,0,0,0,2,0,0,2,0,0,0,2,0,0,2,0,0,0,0],[0,0,0,1,0,0,2,0,0,3,0,0,2,0,0,1,0,0,0],[0,0,0,0,2,0,0,2,0,0,0,2,0,0,2,0,0,0,0],[0,0,0,1,0,0,0,0,2,0,2,0,0,0,0,1,0,0,0],[0,0,0,0,1,0,0,0,0,2,0,0,0,0,1,0,0,0,0],[1,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,1],[0,0,0,0,0,0,1,0,2,0,2,0,1,0,0,0,0,0,0],[0,0,0,0,0,0,0,1,0,1,0,1,0,0,0,0,0,0,0],[1,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,1],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,0])
     if variante == 7:
         #Prueba
-        tablero = ([0,0,0,1,0,0,0],[1,1,1,0,1,0,1],[0,0,1,0,1,0,0],[0,1,1,3,1,1,0],[0,1,1,1,1,1,0],[0,0,0,0,0,0,0],[0,0,0,1,0,0,0])
+        tablero = ([0,0,0,0,1,0,0],
+                   [0,0,1,0,2,0,0],
+                   [1,0,0,1,1,1,1],
+                   [1,1,1,3,2,0,2],
+                   [0,1,2,1,1,2,0],
+                   [0,0,0,1,0,1,0],
+                   [0,0,0,0,0,0,0])    
     estado=(tablero,(1))
     return estado
 
@@ -334,58 +341,56 @@ def aplica_movimiento(estado, movimiento):
     vecinos_movimiento=((arr,newJ),(abj,newJ),(newI,izq),(newI,der))
     coord_centro=int((numer_filas-1)/2)
     centro=(coord_centro,coord_centro)
-    vecinos_centro=((coord_centro,coord_centro+1),(coord_centro,coord_centro-1),(coord_centro-1,coord_centro),(coord_centro+1,coord_centro))
+    #vecinos_centro=((coord_centro,coord_centro+1),(coord_centro,coord_centro-1),(coord_centro-1,coord_centro),(coord_centro+1,coord_centro))
     #Se comprueba en que tipo de movimiento estamos en cuanto a captura; la pieza capturada esta en el centro, esta en una vecina del centro o se encueentra en una posicion normal
     #Este caso es que la ficha a comer esta en el centro el cual debe ser rodeado por los 3 lados
     if(centro in vecinos_movimiento):
         if(tablero[coord_centro][coord_centro] in fichas_rival):
             if(newTablero[coord_centro][coord_centro+1] in fichas_jugador and newTablero[coord_centro][coord_centro-1] in fichas_jugador and newTablero[coord_centro-1][coord_centro] in fichas_jugador and newTablero[coord_centro+1][coord_centro] in fichas_jugador):
-                newTablero[coord_centro][coord_centro]=0
-                
+                newTablero[coord_centro][coord_centro]=0         
     #Este caso es que la ficha a comer esta en una vecina del centro la cual debe ser rodeada por los 3 lados sin contar el centro
-    elif((coord_centro,coord_centro+1) in vecinos_movimiento):
+    if((coord_centro,coord_centro+1) in vecinos_movimiento):
         if(tablero[coord_centro][coord_centro+1] in fichas_rival):
             if(newTablero[coord_centro+1][coord_centro+1] in fichas_jugador and newTablero[coord_centro-1][coord_centro+1] in fichas_jugador and newTablero[coord_centro][coord_centro+2] in fichas_jugador):
                 newTablero[coord_centro][coord_centro+1]=0
-    elif((coord_centro,coord_centro-1) in vecinos_movimiento):
+    if((coord_centro,coord_centro-1) in vecinos_movimiento):
         if(tablero[coord_centro][coord_centro-1] in fichas_rival):
             if(newTablero[coord_centro-1][coord_centro-1] in fichas_jugador and newTablero[coord_centro+1][coord_centro-1] in fichas_jugador and newTablero[coord_centro][coord_centro-2] in fichas_jugador):
                 newTablero[coord_centro][coord_centro-1]=0
-    elif((coord_centro+1,coord_centro) in vecinos_movimiento):
+    if((coord_centro+1,coord_centro) in vecinos_movimiento):
         if(tablero[coord_centro+1][coord_centro] in fichas_rival):
             if(newTablero[coord_centro+2][coord_centro] in fichas_jugador and newTablero[coord_centro+1][coord_centro+1] in fichas_jugador and newTablero[coord_centro+1][coord_centro-1] in fichas_jugador):
                 newTablero[coord_centro+1][coord_centro]=0
-    elif((coord_centro-1,coord_centro) in vecinos_movimiento):
+    if((coord_centro-1,coord_centro) in vecinos_movimiento):
         if(tablero[coord_centro-1][coord_centro] in fichas_rival):
             if(newTablero[coord_centro-2][coord_centro] in fichas_jugador and newTablero[coord_centro-1][coord_centro+1] in fichas_jugador and newTablero[coord_centro-1][coord_centro-1] in fichas_jugador):
                 newTablero[coord_centro-1][coord_centro]=0
-                
+                    
     #Este caso es el normal el cual aplica al encerrar una ficha entre dos tuyas, tambien se comprueba si la ficha esta conjunta a la esquina la cual actua como una ficha compañera
-    else:
-        if(arr>0):
-            if(tablero[arr][newJ] in fichas_rival):
-                if((arr-1==0) and (newJ==0 or newJ==numer_filas-1)):
-                    newTablero[arr][newJ]=0
-                elif(tablero[arr-1][newJ] in fichas_jugador):
-                    newTablero[arr][newJ]=0
-        if(abj<numer_filas-1):
-            if(tablero[abj][newJ] in fichas_rival):
-                if((abj+1==numer_filas-1) and (newJ==0 or newJ==numer_filas-1)):
-                    newTablero[abj][newJ]=0
-                elif(tablero[abj+1][newJ] in fichas_jugador):
-                    newTablero[abj][newJ]=0
-        if(izq>0):
-            if(tablero[newI][izq] in fichas_rival):
-                if((izq-1==0) and (newI==0 or newI==numer_filas-1)):
-                    newTablero[newI][izq]=0
-                elif(tablero[newI][izq-1] in fichas_jugador):
-                    newTablero[newI][izq]=0
-        if(der<numer_filas-1):
-            if(tablero[newI][der] in fichas_rival):
-                if((der+1==numer_filas-1) and (newI==0 or newI==numer_filas-1)):
-                    newTablero[newI][der]=0
-                elif(tablero[newI][der+1] in fichas_jugador):
-                    newTablero[newI][der]=0
+    if(arr>0):
+        if(tablero[arr][newJ] in fichas_rival and (arr,newJ)!=centro):
+            if((arr-1==0) and (newJ==0 or newJ==numer_filas-1)):
+                newTablero[arr][newJ]=0
+            elif(tablero[arr-1][newJ] in fichas_jugador):
+                newTablero[arr][newJ]=0
+    if(abj<numer_filas-1):
+        if(tablero[abj][newJ] in fichas_rival and (abj,newJ)!=centro):
+            if((abj+1==numer_filas-1) and (newJ==0 or newJ==numer_filas-1)):
+                newTablero[abj][newJ]=0
+            elif(tablero[abj+1][newJ] in fichas_jugador):
+                newTablero[abj][newJ]=0
+    if(izq>0):
+        if(tablero[newI][izq] in fichas_rival and (newI,izq)!=centro):
+            if((izq-1==0) and (newI==0 or newI==numer_filas-1)):
+                newTablero[newI][izq]=0
+            elif(tablero[newI][izq-1] in fichas_jugador):
+                newTablero[newI][izq]=0
+    if(der<numer_filas-1):
+        if(tablero[newI][der] in fichas_rival and (newI,der)!=centro):
+            if((der+1==numer_filas-1) and (newI==0 or newI==numer_filas-1)):
+                newTablero[newI][der]=0
+            elif(tablero[newI][der+1] in fichas_jugador):
+                newTablero[newI][der]=0
 
     if(ficha==1):
         newEstado=(newTablero, 2)
@@ -451,26 +456,30 @@ def crear_tablero_pygame(tablero):
 def busca_solucion(s0, t, numero_turno):
     v0 = nodo(s0, None, numero_turno)
     t0 = time.time()
+    v0copy= deepcopy(v0)
     while( time.time() - t0 < t):
         v1 = tree_policy(v0)
         delta = default_policy(v1)
         backup(v1,delta)
     mejorNodo= best_child(v0,0)
-    return v0.movimientos[mejorNodo.i]
+    return v0.movimientos[mejorNodo.indMov]
 
 def tree_policy(v):
     while( es_estado_final(v.estado, len(v.movimientos), v.turno)==False):
         if(v.i<len(v.movimientos)):
             return expand(v)
         else:
-            indiceMejorHijo = best_child(v, 1/math.sqrt(2)).i
-            v = v.hijos[indiceMejorHijo]
+            mejorHijo = best_child(v, 1/math.sqrt(2))
+            v = mejorHijo
     return v
 
 def expand(v):
-    s = aplica_movimiento(v.estado,v.movimientos[v.i])
+    copiaTablero=deepcopy(v).estado
+    s = aplica_movimiento(copiaTablero, v.movimientos[v.i])
     v.i = v.i+1
     hijo = nodo(s,v,v.turno-1)
+    hijo.indMov = v.i-1
+    hijo.turno = v.turno-1
     v.hijos.append(hijo)
     return hijo
 
@@ -483,7 +492,7 @@ def best_child(v,c):
         if(heuristica>max):
             max = heuristica
             indiceMejorHijo=contador
-        contador=+1
+        contador+=1
     return v.hijos[indiceMejorHijo]
 
 def default_policy(v):
@@ -504,7 +513,7 @@ def default_policy(v):
         return 1
     else:
         #print("Empate")
-        return -1
+        return -0.5
 
 def backup(v,delta):
     while(v != None):
@@ -512,7 +521,46 @@ def backup(v,delta):
         v.q = v.q + delta
         delta = -delta
         v = v.padre
+        
+def selecciona_pieza():
+    print("Jugar con negras o con blancas")
+    pieza = int(input("Negra -> 1 \n Blanca -> 2"))
+    if(pieza==1):
+        return 1
+    elif(pieza==2):
+        return 2
+    else:
+        print("Pieza incorrecta")
+        selecciona_pieza()
 
+def selecciona_modo():
+    print("Jugador contra IA, jugador contra jugador o IA contra IA: ")
+    modo = int(input("Jug vs IA -> 1 \n Jug vs Jug -> 2 \n IA vs IA -> 3"))
+    if(modo==1):
+        selecciona_pieza()
+        return 1
+    elif(modo==2):
+        return 2
+    elif(modo==3):
+        return 3
+    else:
+        print("Opción incorrecta")
+        selecciona_modo()
+        
+def turno_jugador(estado, movimientos):
+    print(movimientos)
+    #Se pide un movimiento y se verifica que sea valido, si lo es se aplica y se pasa al turno del nuevo jugador
+    newEstado = movimiento_valido(estado, movimientos)
+    return newEstado
+
+def turno_maquina(estado, movimientos, numero_turnos, tiempo):
+    print(movimientos)
+    estadoAlternativo=deepcopy(estado)
+    #Se aplica el algoritmo de montecarlo para encontrar un movimiento 
+    accion = busca_solucion(estadoAlternativo, tiempo, numero_turnos)
+    print(accion)
+    newEstado = aplica_movimiento(estado, accion)
+    return newEstado
 
 def interfaz_usuario():
     #Inicializando pygame
@@ -521,7 +569,14 @@ def interfaz_usuario():
     icon = pygame.image.load('viking-helmet.png')
     pygame.display.set_icon(icon)"""
 
-
+    #Se pide el modo de juego, contra IA o contra otro jugador en local
+    #modo=selecciona_modo()
+    #Si se juega contra la IA se pide la pieza que quiere jugar el jugador y el tiempo de computación de la IA
+    #color_jugador
+    #tiempo
+    #if(modo==1):
+    #    color_jugador=selecciona_pieza()
+    #    tiempo=int(input("Ingrese el tiempo de computación de la IA: "))
     #Se pide al usuario que seleccione una variante de juego
     variante=elige_variante()
     #Se pide al usuario que seleccione un numero de turnos a jugar antes de terminar en tablas
@@ -537,18 +592,30 @@ def interfaz_usuario():
         movimientos = obtiene_movimientos(estado)
         num_movimientos = len(movimientos)
         fin = imprime_estado(estado, num_movimientos,numero_turnos)
+        jugador=estado[1]
         #Se imprimen los posibles movimientos del jugador
         if(fin!=True):
-            print(movimientos)
+            #Se observa el modo de juego y se ejecuta el turno correspondiente dependiendo del turno 
+            """if(modo==1):
+                if(jugador==color_jugador):
+                    estado = turno_jugador(estado, movimientos)
+                else:
+                    estado = turno_maquina(estado, movimientos, numero_turnos, tiempo)
+            else:
+                estado = turno_jugador(estado, movimientos)"""
+            #print(movimientos)
             estadoAlternativo=deepcopy(estado)
             #print(busca_solucion(estadoAlternativo, 9999999999, numero_turnos))
-            #Se pide un movimiento y se verifica que sea valido, si lo es se aplica y se pasa al turno del nuevo jugador
             #newEstado = movimiento_valido(estado, movimientos)
             accion = busca_solucion(estadoAlternativo, 20, numero_turnos)
+            print(numero_turnos)
             print(accion)
             newEstado = aplica_movimiento(estado, accion)
             estado = newEstado
+            #estado = turno_jugador(estado, movimientos)
             numero_turnos-=1
+        else:
+            break
 
            
          
