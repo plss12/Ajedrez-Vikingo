@@ -8,8 +8,6 @@
 #0 casilla vacia, 1 casilla ocupada por peon negro, 2 casilla ocupada por peon blanco
 # y 3 casilla ocupada por el rey blanco
 
-from calendar import c
-from hashlib import new
 from copy import deepcopy
 import random
 import ast
@@ -33,30 +31,88 @@ class nodo:
 def estado_inicial(variante):
     if variante == 1:
         #Hnefatafl 
-        tablero = ([0,0,0,1,1,1,1,1,0,0,0],[0,0,0,0,0,1,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[1,0,0,0,0,2,0,0,0,0,1],[1,0,0,0,2,2,2,0,0,0,1],[1,1,0,2,2,3,2,2,0,1,1],[1,0,0,0,2,2,2,0,0,0,1],[1,0,0,0,0,2,0,0,0,0,1],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,1,0,0,0,0,0],[0,0,0,1,1,1,1,1,0,0,0])
+        tablero = ([0,0,0,1,1,1,1,1,0,0,0],
+                   [0,0,0,0,0,1,0,0,0,0,0],
+                   [0,0,0,0,0,0,0,0,0,0,0],
+                   [1,0,0,0,0,2,0,0,0,0,1],
+                   [1,0,0,0,2,2,2,0,0,0,1],
+                   [1,1,0,2,2,3,2,2,0,1,1],
+                   [1,0,0,0,2,2,2,0,0,0,1],
+                   [1,0,0,0,0,2,0,0,0,0,1],
+                   [0,0,0,0,0,0,0,0,0,0,0],
+                   [0,0,0,0,0,1,0,0,0,0,0],
+                   [0,0,0,1,1,1,1,1,0,0,0])
     if variante == 2:
         #Tablut
-        tablero = ([0,0,0,1,1,1,0,0,0],[0,0,0,0,1,0,0,0,0],[0,0,0,0,2,0,0,0,0],[1,0,0,0,2,0,0,0,1],[1,1,2,2,3,2,2,1,1],[1,0,0,0,2,0,0,0,1],[0,0,0,0,2,0,0,0,0],[0,0,0,0,1,0,0,0,0],[0,0,0,1,1,1,0,0,0])
+        tablero = ([0,0,0,1,1,1,0,0,0],
+                   [0,0,0,0,1,0,0,0,0],
+                   [0,0,0,0,2,0,0,0,0],
+                   [1,0,0,0,2,0,0,0,1],
+                   [1,1,2,2,3,2,2,1,1],
+                   [1,0,0,0,2,0,0,0,1],
+                   [0,0,0,0,2,0,0,0,0],
+                   [0,0,0,0,1,0,0,0,0],
+                   [0,0,0,1,1,1,0,0,0])
     if variante == 3:
         #Ard Ri
-        tablero = ([0,0,1,1,1,0,0],[0,0,0,1,0,0,0],[1,0,2,2,2,0,1],[1,1,2,3,2,1,1],[1,0,2,2,2,0,1],[0,0,0,1,0,0,0],[0,0,1,1,1,0,0])
+        tablero = ([0,0,1,1,1,0,0],
+                   [0,0,0,1,0,0,0],
+                   [1,0,2,2,2,0,1],
+                   [1,1,2,3,2,1,1],
+                   [1,0,2,2,2,0,1],
+                   [0,0,0,1,0,0,0],
+                   [0,0,1,1,1,0,0])
     if variante == 4:
         #Brandubh
-        tablero = ([0,0,0,1,0,0,0],[0,0,0,1,0,0,0],[0,0,0,2,0,0,0],[1,1,2,3,2,1,1],[0,0,0,2,0,0,0],[0,0,0,1,0,0,0],[0,0,0,1,0,0,0])
+        tablero = ([0,0,0,1,0,0,0],
+                   [0,0,0,1,0,0,0],
+                   [0,0,0,2,0,0,0],
+                   [1,1,2,3,2,1,1],
+                   [0,0,0,2,0,0,0],
+                   [0,0,0,1,0,0,0],
+                   [0,0,0,1,0,0,0])
     if variante == 5:
         #Tawlbwrdd
-        tablero = ([0,0,0,0,1,1,1,0,0,0,0],[0,0,0,0,1,0,1,0,0,0,0],[0,0,0,0,0,1,0,0,0,0,0],[0,0,0,0,0,2,0,0,0,0,0],[1,1,0,0,2,2,2,0,0,1,1],[1,0,1,2,2,3,2,2,1,0,1],[1,1,0,0,2,2,2,0,0,1,1],[0,0,0,0,0,2,0,0,0,0,0],[0,0,0,0,0,1,0,0,0,0,0],[0,0,0,0,1,0,1,0,0,0,0],[0,0,0,0,1,1,1,0,0,0,0])
+        tablero = ([0,0,0,0,1,1,1,0,0,0,0],
+                   [0,0,0,0,1,0,1,0,0,0,0],
+                   [0,0,0,0,0,1,0,0,0,0,0],
+                   [0,0,0,0,0,2,0,0,0,0,0],
+                   [1,1,0,0,2,2,2,0,0,1,1],
+                   [1,0,1,2,2,3,2,2,1,0,1],
+                   [1,1,0,0,2,2,2,0,0,1,1],
+                   [0,0,0,0,0,2,0,0,0,0,0],
+                   [0,0,0,0,0,1,0,0,0,0,0],
+                   [0,0,0,0,1,0,1,0,0,0,0],
+                   [0,0,0,0,1,1,1,0,0,0,0])
     if variante == 6:
         #Alea Evangelii
-        tablero = ([0,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[1,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,1],[0,0,0,0,0,0,0,1,0,1,0,1,0,0,0,0,0,0,0],[0,0,0,0,0,0,1,0,2,0,2,0,1,0,0,0,0,0,0],[1,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,1],[0,0,0,0,1,0,0,0,0,2,0,0,0,0,1,0,0,0,0],[0,0,0,1,0,0,0,0,2,0,2,0,0,0,0,1,0,0,0],[0,0,0,0,2,0,0,2,0,0,0,2,0,0,2,0,0,0,0],[0,0,0,1,0,0,2,0,0,3,0,0,2,0,0,1,0,0,0],[0,0,0,0,2,0,0,2,0,0,0,2,0,0,2,0,0,0,0],[0,0,0,1,0,0,0,0,2,0,2,0,0,0,0,1,0,0,0],[0,0,0,0,1,0,0,0,0,2,0,0,0,0,1,0,0,0,0],[1,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,1],[0,0,0,0,0,0,1,0,2,0,2,0,1,0,0,0,0,0,0],[0,0,0,0,0,0,0,1,0,1,0,1,0,0,0,0,0,0,0],[1,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,1],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,0])
+        tablero = ([0,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,0],
+                   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                   [1,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,1],
+                   [0,0,0,0,0,0,0,1,0,1,0,1,0,0,0,0,0,0,0],
+                   [0,0,0,0,0,0,1,0,2,0,2,0,1,0,0,0,0,0,0],
+                   [1,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,1],
+                   [0,0,0,0,1,0,0,0,0,2,0,0,0,0,1,0,0,0,0],
+                   [0,0,0,1,0,0,0,0,2,0,2,0,0,0,0,1,0,0,0],
+                   [0,0,0,0,2,0,0,2,0,0,0,2,0,0,2,0,0,0,0],
+                   [0,0,0,1,0,0,2,0,0,3,0,0,2,0,0,1,0,0,0],
+                   [0,0,0,0,2,0,0,2,0,0,0,2,0,0,2,0,0,0,0],
+                   [0,0,0,1,0,0,0,0,2,0,2,0,0,0,0,1,0,0,0],
+                   [0,0,0,0,1,0,0,0,0,2,0,0,0,0,1,0,0,0,0],
+                   [1,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,1],
+                   [0,0,0,0,0,0,1,0,2,0,2,0,1,0,0,0,0,0,0],
+                   [0,0,0,0,0,0,0,1,0,1,0,1,0,0,0,0,0,0,0],
+                   [1,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,1],
+                   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                   [0,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,0])
     if variante == 7:
         #Prueba
-        tablero = ([0,0,0,0,1,0,0],
-                   [0,0,1,0,2,0,0],
-                   [1,0,0,1,1,1,1],
-                   [1,1,1,3,2,0,2],
-                   [0,1,2,1,1,2,0],
-                   [0,0,0,1,0,1,0],
+        tablero = ([0,0,1,0,0,0,0],
+                   [0,0,1,0,1,1,1],
+                   [0,0,1,0,1,0,0],
+                   [0,1,0,3,1,0,0],
+                   [0,0,0,1,0,0,0],
+                   [0,0,0,0,0,0,0],
                    [0,0,0,0,0,0,0])    
     estado=(tablero,(1))
     return estado
@@ -226,27 +282,32 @@ def obtiene_movimientos(estado):
     return random.sample(movimientos, len(movimientos))
     
 #Se comprueban si algun jugador esta en un estado final de victoria
-def ganan_negras(estado, numero_de_movimientos):
+def ganan_negras(estado,num_movs):
     tablero = estado[0]
+    jugador = estado[1]
     resultado = True
-    for i in range(0,len(tablero)):
-        if(3 in tablero[i]):
-            resultado=False
-            break
-    return resultado
+    if(num_movs==0 and jugador==2):
+        return resultado
+    else:
+        for i in range(0,len(tablero)):
+            if(3 in tablero[i]):
+                resultado=False
+                break
+        return resultado
 
-def ganan_blancas(estado, numero_de_movimientos):
+def ganan_blancas(estado, num_movs):
     tablero = estado[0]
+    jugador = estado[1]
     resultado = False
     #Comprobar que el valor de las casillas de las esquinas del tablero es 3
     if(tablero[0][0]==3 or tablero[0][len(tablero[0])-1]==3 or tablero[len(tablero)-1][0]==3 or tablero[len(tablero)-1][len(tablero[0])-1]==3):
         resultado=True
+    elif(num_movs==0 and jugador==1):
+        resultado=True
     return resultado
 
 def es_estado_final(estado, numero_de_movimientos, numero_turnos):
-    if(numero_de_movimientos==0):
-        return True
-    elif(numero_turnos==0):
+    if(numero_turnos==0):
         return True
     else:
         negras_ganan = ganan_negras(estado, numero_de_movimientos)
@@ -407,8 +468,6 @@ def movimiento_valido(estado, movimientos):
         print("Movimiento no valido, aplica un movimiento valido")
         return movimiento_valido(estado, movimientos)
     
-#def busca_solucion(estado, tiempo):
-
 def elige_variante():
     #Se pide al usuario que seleccione una variante de juego
     print("Seleccione una variante de juego:")
@@ -479,7 +538,6 @@ def expand(v):
     v.i = v.i+1
     hijo = nodo(s,v,v.turno-1)
     hijo.indMov = v.i-1
-    hijo.turno = v.turno-1
     v.hijos.append(hijo)
     return hijo
 
@@ -498,22 +556,25 @@ def best_child(v,c):
 def default_policy(v):
     s = deepcopy(v.estado)
     movs = v.movimientos
-    jugador = v.estado[1]
+    jugador = v.padre.estado[1]
     turno = v.turno
     while(es_estado_final(s,len(movs),turno)==False):
         a = random.choice(movs)
         s = aplica_movimiento(s,a)
         movs = obtiene_movimientos(s)
         turno -= 1
-    if(ganan_blancas(s,len(movs) and jugador==2)):
+    if(ganan_blancas(s,len(movs)) and jugador==2):
         #print("Blancas")
         return 1
-    elif(ganan_negras(s,len(movs) and jugador==1)):
+    elif(ganan_negras(s,len(movs)) and jugador==1): 
         #print("Negras")
         return 1
-    else:
+    #elif(turno==0):
         #print("Empate")
-        return -0.5
+        #return -0.5 
+    else:
+        #print("Ganan negras cuando es turno de blancas o al reves")
+        return -1
 
 def backup(v,delta):
     while(v != None):
@@ -523,8 +584,9 @@ def backup(v,delta):
         v = v.padre
         
 def selecciona_pieza():
-    print("Jugar con negras o con blancas")
-    pieza = int(input("Negra -> 1 \n Blanca -> 2"))
+    print("Elige color para jugar")
+    print("Negra -> 1 \nBlanca -> 2")
+    pieza = int(input("Color: "))
     if(pieza==1):
         return 1
     elif(pieza==2):
@@ -534,10 +596,10 @@ def selecciona_pieza():
         selecciona_pieza()
 
 def selecciona_modo():
-    print("Jugador contra IA, jugador contra jugador o IA contra IA: ")
-    modo = int(input("Jug vs IA -> 1 \n Jug vs Jug -> 2 \n IA vs IA -> 3"))
+    print("\nElige un modo de juego")
+    print("Jugador vs IA -> 1\nJugador vs Jugador -> 2\nIA vs IA -> 3")
+    modo = int(input("Modo: "))
     if(modo==1):
-        selecciona_pieza()
         return 1
     elif(modo==2):
         return 2
@@ -570,13 +632,14 @@ def interfaz_usuario():
     pygame.display.set_icon(icon)"""
 
     #Se pide el modo de juego, contra IA o contra otro jugador en local
-    #modo=selecciona_modo()
+    modo=selecciona_modo()
     #Si se juega contra la IA se pide la pieza que quiere jugar el jugador y el tiempo de computación de la IA
-    #color_jugador
-    #tiempo
-    #if(modo==1):
-    #    color_jugador=selecciona_pieza()
-    #    tiempo=int(input("Ingrese el tiempo de computación de la IA: "))
+    if(modo==1):
+        color_jugador=selecciona_pieza()
+        tiempo=int(input("Ingrese el tiempo de computación de la IA: "))
+    if(modo==3):
+        tiempo1=int(input("Ingrese el tiempo de computación de la IA negra: "))
+        tiempo2=int(input("Ingrese el tiempo de computación de la IA blanca: "))
     #Se pide al usuario que seleccione una variante de juego
     variante=elige_variante()
     #Se pide al usuario que seleccione un numero de turnos a jugar antes de terminar en tablas
@@ -592,26 +655,31 @@ def interfaz_usuario():
         movimientos = obtiene_movimientos(estado)
         num_movimientos = len(movimientos)
         fin = imprime_estado(estado, num_movimientos,numero_turnos)
+        print("Número de turnos restantes: ",numero_turnos)
         jugador=estado[1]
         #Se imprimen los posibles movimientos del jugador
         if(fin!=True):
             #Se observa el modo de juego y se ejecuta el turno correspondiente dependiendo del turno 
-            """if(modo==1):
+            if(modo==1):
                 if(jugador==color_jugador):
                     estado = turno_jugador(estado, movimientos)
                 else:
                     estado = turno_maquina(estado, movimientos, numero_turnos, tiempo)
+            elif(modo==2):
+                estado = turno_jugador(estado, movimientos)
             else:
-                estado = turno_jugador(estado, movimientos)"""
-            #print(movimientos)
-            estadoAlternativo=deepcopy(estado)
+                if(jugador==1):
+                    estado = turno_maquina(estado, movimientos, numero_turnos, tiempo1)
+                else:
+                    estado = turno_maquina(estado, movimientos, numero_turnos, tiempo2)
+            #estadoAlternativo=deepcopy(estado)
             #print(busca_solucion(estadoAlternativo, 9999999999, numero_turnos))
             #newEstado = movimiento_valido(estado, movimientos)
-            accion = busca_solucion(estadoAlternativo, 20, numero_turnos)
-            print(numero_turnos)
-            print(accion)
-            newEstado = aplica_movimiento(estado, accion)
-            estado = newEstado
+            #accion = busca_solucion(estadoAlternativo, 20, numero_turnos)
+            #print(numero_turnos)
+            #print(accion)
+            #newEstado = aplica_movimiento(estado, accion)
+            #estado = newEstado
             #estado = turno_jugador(estado, movimientos)
             numero_turnos-=1
         else:
