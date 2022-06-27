@@ -11,9 +11,9 @@
 from copy import deepcopy
 import random
 import ast
-import pygame
 import time
 import math
+
 
 #Esta es la clase nodo la cual usaremos en el algoritmo de busqueda de solución
 class nodo:
@@ -27,8 +27,7 @@ class nodo:
         self.turno = numero_turno
         self.hijos = []
         self.padre = padre
-
-
+    
 def estado_inicial(variante):
     if variante == 1:
         #Hnefatafl 
@@ -108,13 +107,13 @@ def estado_inicial(variante):
                    [0,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,0])
     if variante == 7:
         #Prueba
-        tablero =  ([0,1,1,1,1,0,0],
-                    [0,0,2,0,0,0,0],
-                    [1,0,0,3,1,0,1],
-                    [1,1,2,0,2,0,1],
-                    [1,0,1,2,0,0,1],
-                    [0,0,0,1,0,0,0],
-                    [0,0,1,1,1,0,0])   
+        tablero =  ([0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0],
+                    [0,0,0,0,0,2,0],
+                    [0,0,2,0,0,1,0],
+                    [0,1,1,1,0,3,0]) 
     estado=(tablero,(1))
     return estado
 
@@ -354,10 +353,10 @@ def imprime_estado(estado, numero_de_movimientos, numero_turnos):
     #Se comprueba si el estado es final y se imprime el resultado dependiendo del jugador que haya jugado anteriormente
     final=es_estado_final(estado, numero_de_movimientos, numero_turnos)
     if(final):
-        if(jugador==1):
+        if(jugador==1 and numero_turnos!=0):
             print("Ganan blancas")
             return True
-        elif(jugador==2):
+        elif(jugador==2 and numero_turnos!=0):
             print("Ganan negras")
             return True
         elif(numero_turnos==0):
@@ -495,7 +494,7 @@ def busca_solucion(s0, t, numero_turno):
         v1 = tree_policy(v0)
         delta = default_policy(v1)
         backup(v1,delta)
-    mejorNodo= best_child(v0,0)
+    mejorNodo = best_child(v0,0)
     return v0.movimientos[mejorNodo.indMov]
 
 def tree_policy(v):
@@ -519,7 +518,7 @@ def expand(v):
 def best_child(v,c):
     indiceMejorHijo=0
     contador=0
-    max=0
+    max=-math.inf
     for hijo in v.hijos:
         heuristica = hijo.q/hijo.n + (c * math.sqrt((2*math.log(v.n))/hijo.n))
         if(heuristica>max):
@@ -610,10 +609,16 @@ def interfaz_usuario():
     #Si se juega contra la IA se pide la pieza que quiere jugar el jugador y el tiempo de computación de la IA
     if(modo==1):
         color_jugador=selecciona_pieza()
-        tiempo=int(input("Ingrese el tiempo de computación de la IA: "))
+        tiempo=-math.inf
+        while(tiempo<0):
+            tiempo=int(input("Ingrese el tiempo de computación de la IA: "))
     if(modo==3):
-        tiempo1=int(input("Ingrese el tiempo de computación de la IA negra: "))
-        tiempo2=int(input("Ingrese el tiempo de computación de la IA blanca: "))
+        tiempo1=-math.inf
+        while(tiempo1<0):
+            tiempo1=int(input("Ingrese el tiempo de computación de la IA negra: "))
+        tiempo2=-math.inf
+        while(tiempo2<0):
+            tiempo2=int(input("Ingrese el tiempo de computación de la IA blanca: "))
     #Se pide al usuario que seleccione una variante de juego
     variante=elige_variante()
     #Se pide al usuario que seleccione un numero de turnos a jugar antes de terminar en tablas
@@ -648,7 +653,7 @@ def interfaz_usuario():
             numero_turnos-=1
         else:
             break
-        
+ 
 def main():
     interfaz_usuario()
         
