@@ -108,11 +108,13 @@ def estado_inicial(variante):
                    [0,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,0])
     if variante == 7:
         #Prueba
-        tablero = ([0,0,0,0,0],
-                   [0,0,1,0,0],
-                   [0,1,3,1,0],
-                   [0,1,0,0,0],
-                   [0,0,0,0,0])    
+        tablero =  ([0,1,1,1,1,0,0],
+                    [0,0,2,0,0,0,0],
+                    [1,0,0,3,1,0,1],
+                    [1,1,2,0,2,0,1],
+                    [1,0,1,2,0,0,1],
+                    [0,0,0,1,0,0,0],
+                    [0,0,1,1,1,0,0])   
     estado=(tablero,(1))
     return estado
 
@@ -352,14 +354,14 @@ def imprime_estado(estado, numero_de_movimientos, numero_turnos):
     #Se comprueba si el estado es final y se imprime el resultado dependiendo del jugador que haya jugado anteriormente
     final=es_estado_final(estado, numero_de_movimientos, numero_turnos)
     if(final):
-        if(numero_turnos==0):
-            print("Tablas, se acabaron los turnos")
-            return True
-        elif(jugador==1):
+        if(jugador==1):
             print("Ganan blancas")
             return True
-        else:
+        elif(jugador==2):
             print("Ganan negras")
+            return True
+        elif(numero_turnos==0):
+            print("Tablas, se acabaron los turnos")
             return True
     #Si no es estado final se imprime jugador y sus posibles movimientos
     else:
@@ -398,6 +400,7 @@ def aplica_movimiento(estado, movimiento):
     der=newJ+1
     vecinos_movimiento=((arr,newJ),(abj,newJ),(newI,izq),(newI,der))
     coord_centro=int((numer_filas-1)/2)
+    vecinos_centro=((coord_centro,coord_centro+1),(coord_centro,coord_centro-1),(coord_centro-1,coord_centro),(coord_centro+1,coord_centro))
     centro=(coord_centro,coord_centro)
     #Se comprueba en que tipo de movimiento estamos en cuanto a captura; la pieza capturada esta en el centro, esta en una vecina del centro o se encueentra en una posicion normal
     #Este caso es que la ficha a comer esta en el centro el cual debe ser rodeado por los 3 lados
@@ -425,25 +428,25 @@ def aplica_movimiento(estado, movimiento):
                     
     #Este caso es el normal el cual aplica al encerrar una ficha entre dos tuyas, tambien se comprueba si la ficha esta conjunta a la esquina la cual actua como una ficha compañera
     if(arr>0):
-        if(tablero[arr][newJ] in fichas_rival and (arr,newJ)!=centro):
+        if(tablero[arr][newJ] in fichas_rival and (arr,newJ)!=centro and ((arr, newJ) in vecinos_centro)==False):
             if((arr-1==0) and (newJ==0 or newJ==numer_filas-1)):
                 newTablero[arr][newJ]=0
             elif(tablero[arr-1][newJ] in fichas_jugador):
                 newTablero[arr][newJ]=0
     if(abj<numer_filas-1):
-        if(tablero[abj][newJ] in fichas_rival and (abj,newJ)!=centro):
+        if(tablero[abj][newJ] in fichas_rival and (abj,newJ)!=centro and ((abj, newJ) in vecinos_centro)==False):
             if((abj+1==numer_filas-1) and (newJ==0 or newJ==numer_filas-1)):
                 newTablero[abj][newJ]=0
             elif(tablero[abj+1][newJ] in fichas_jugador):
                 newTablero[abj][newJ]=0
     if(izq>0):
-        if(tablero[newI][izq] in fichas_rival and (newI,izq)!=centro):
+        if(tablero[newI][izq] in fichas_rival and (newI,izq)!=centro and ((newI, izq) in vecinos_centro)==False):
             if((izq-1==0) and (newI==0 or newI==numer_filas-1)):
                 newTablero[newI][izq]=0
             elif(tablero[newI][izq-1] in fichas_jugador):
                 newTablero[newI][izq]=0
     if(der<numer_filas-1):
-        if(tablero[newI][der] in fichas_rival and (newI,der)!=centro):
+        if(tablero[newI][der] in fichas_rival and (newI,der)!=centro and ((newI, der) in vecinos_centro)==False):
             if((der+1==numer_filas-1) and (newI==0 or newI==numer_filas-1)):
                 newTablero[newI][der]=0
             elif(tablero[newI][der+1] in fichas_jugador):
@@ -479,7 +482,7 @@ def elige_variante():
 
 def elige_numero_turnos():
     #Se piden los turnos que se quieren jugar antes de acabar en tablas
-    numero_turnos = int(input("Numero de turnos a jugar antes de terminar en tablas: "))
+    numero_turnos = int(input("Número de turnos a jugar antes de terminar en tablas: "))
     if(numero_turnos<1):
         print("Variante incorrecta")
         elige_numero_turnos()
@@ -539,8 +542,12 @@ def default_policy(v):
         return 1
     elif(ganan_negras(s,len(movs)) and jugador==1):
         return 1
-    else:
+    elif(ganan_negras(s,len(movs)) and jugador==2):
         return -1
+    elif(ganan_blancas(s,len(movs)) and jugador==1):
+        return -1
+    else:
+        return -0.5
 
 def backup(v,delta):
     while(v != None):
